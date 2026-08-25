@@ -1,6 +1,7 @@
 """Proveedores de factores de emision base por tipo de vehiculo."""
 
 from collections.abc import Mapping
+from types import MappingProxyType
 from typing import Final, Protocol
 
 from carbon_tracker.domain.errors import UnsupportedVehicleTypeError
@@ -35,7 +36,9 @@ class StaticEmissionFactorProvider:
 
     def __init__(self, factors: Mapping[VehicleType, float] | None = None) -> None:
         self._factors: Mapping[VehicleType, float] = (
-            BASE_EMISSION_FACTORS_KG_CO2_PER_KM if factors is None else dict(factors)
+            MappingProxyType(BASE_EMISSION_FACTORS_KG_CO2_PER_KM)
+            if factors is None
+            else MappingProxyType(factors)
         )
 
     def get_base_emission_factor(self, vehicle_type: VehicleType) -> float:

@@ -252,3 +252,12 @@ class TestDependencyInjection:
         result = custom_calculator.calculate(build_trip(cargo_weight_tons=0.0))
 
         assert result.total_kg == pytest.approx(200.0)
+
+    def test_rejects_provider_without_expected_method(self) -> None:
+        """FIX #4: EmissionCalculator valida en runtime que el provider implementa la interfaz."""
+
+        class BrokenProvider:
+            pass
+
+        with pytest.raises(TypeError, match="get_base_emission_factor"):
+            EmissionCalculator(BrokenProvider())  # type: ignore[arg-type]

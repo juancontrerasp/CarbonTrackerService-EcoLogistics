@@ -101,6 +101,22 @@ class TestNonNumericTypesRejected:
         with pytest.raises(InvalidTripError, match="must be a JSON number"):
             build_trip(**{field_name: "100"})
 
+    @pytest.mark.parametrize("field_name", NUMERIC_FIELDS)
+    @pytest.mark.parametrize(
+        "bad_value",
+        [
+            {"value": 1},
+            [1.0],
+            b"1.0",
+        ],
+    )
+    def test_rejects_non_int_float_types_in_numeric_fields(
+        self, build_trip: Callable[..., Trip], field_name: str, bad_value: object
+    ) -> None:
+        """FIX #8: tipos numericos exoticos (dict, list, bytes) rechazados en runtime."""
+        with pytest.raises(InvalidTripError, match="must be a JSON number"):
+            build_trip(**{field_name: bad_value})
+
 
 class TestVehicleTypeValidation:
     """REQUISITO: "Tipo de vehiculo inexistente" tambien en el dominio.

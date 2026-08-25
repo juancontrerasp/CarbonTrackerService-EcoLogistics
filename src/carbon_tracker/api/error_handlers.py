@@ -1,5 +1,6 @@
 """Manejo centralizado de errores: un unico lugar define su forma en HTTP."""
 
+import logging
 from typing import Any
 
 from fastapi import FastAPI, Request, status
@@ -11,6 +12,8 @@ from carbon_tracker.domain.errors import (
     InvalidTripError,
     UnsupportedVehicleTypeError,
 )
+
+logger = logging.getLogger(__name__)
 
 
 def _error_body(code: str, message: str, details: list[dict[str, Any]] | None = None) -> dict:
@@ -44,6 +47,7 @@ async def _handle_request_validation_error(
     exc: RequestValidationError,
 ) -> JSONResponse:
     """Traduce fallos del contrato HTTP (Pydantic) a 422 con forma uniforme."""
+    logger.warning("Validation error: %s", exc.errors())
     details = [
         {"field": _field_from_location(error["loc"]), "message": error["msg"]}
         for error in exc.errors()
@@ -57,6 +61,7 @@ async def _handle_request_validation_error(
 
 
 def _domain_error_response(exc: CarbonTrackerDomainError, code: str) -> JSONResponse:
+    logger.warning("Domain error [%s]: %s", code, exc)
     return _json_error(status.HTTP_400_BAD_REQUEST, code=code, message=str(exc))
 
 

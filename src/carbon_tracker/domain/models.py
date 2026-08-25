@@ -52,13 +52,17 @@ def _validate_vehicle_type(vehicle_type: object) -> None:
 
 
 def _reject_non_numeric(value: object, field_name: str) -> None:
-    """Excluye str/bool antes de todo chequeo numerico.
+    """Excluye tipos no numericos antes de cualquier chequeo de rango.
 
     ``bool`` es subclase de ``int``: sin este guardia, un ``True`` pasaria
     ``isfinite`` como 1.0. Un ``str``, ademas, haria fallar ``isfinite`` con
     un TypeError crudo en lugar de un error de dominio tipado.
     """
     if isinstance(value, (str, bool)):
+        raise InvalidTripError(
+            f"{field_name} must be a JSON number, got {type(value).__name__}"
+        )
+    if not isinstance(value, (int, float)):
         raise InvalidTripError(
             f"{field_name} must be a JSON number, got {type(value).__name__}"
         )
@@ -86,6 +90,6 @@ def _validate_efficiency_factor(efficiency_factor: float) -> None:
     _reject_non_numeric(efficiency_factor, "efficiency_factor")
     if not isfinite(efficiency_factor) or not 0.0 < efficiency_factor <= MAX_EFFICIENCY_FACTOR:
         raise InvalidTripError(
-            f"efficiency_factor must be a finite value greater than 0 "
-            f"and at most {MAX_EFFICIENCY_FACTOR}, got {efficiency_factor}"
+            f"efficiency_factor must be a finite value in the range (0, "
+            f"{MAX_EFFICIENCY_FACTOR}], got {efficiency_factor}"
         )

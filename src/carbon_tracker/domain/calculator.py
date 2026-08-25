@@ -37,6 +37,10 @@ class EmissionCalculator:
     """
 
     def __init__(self, factor_provider: EmissionFactorProvider) -> None:
+        if not callable(getattr(factor_provider, "get_base_emission_factor", None)):
+            raise TypeError(
+                "factor_provider must implement get_base_emission_factor()"
+            )
         self._factor_provider = factor_provider
 
     def calculate(self, trip: Trip) -> EmissionResult:
