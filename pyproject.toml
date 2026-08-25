@@ -1,0 +1,35 @@
+[project]
+name = "carbon-tracker-service"
+version = "0.1.0"
+description = "Microservicio para calcular emisiones estimadas de CO2 en viajes logisticos (EcoLogistics)."
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi>=0.115.0",
+    "uvicorn>=0.32.0",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.3.0",
+    "pytest-cov>=6.0.0",
+    "httpx>=0.28.0",
+    "ruff>=0.8.0",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/carbon_tracker"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "W", "F", "I", "B", "C4", "SIM", "UP", "RUF"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
